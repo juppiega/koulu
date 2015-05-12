@@ -20,12 +20,12 @@ private:
 	double resolution;  // Grid cell width (km).
 	double upperLeftLatitude;  // Latitude of North-West corner of the grid.
 	double simulationSeconds; // Length of simulation in seconds.
-	double U; // Speed of inflow at the western boundaty (m/s).
+	double U; // Speed of inflow at the western boundary (m/s).
 	double initHeight; // Initial total height (km)
 	double dt; // Timestep defined such that Courant condition (U*dt/dx) = 0.9
 	long timestepNum;
 	NcFile* ncfile; // Output file.
-	NcVar *t, *u, *v, *h, *htot, *dx;
+	NcVar *t, *u, *v, *h, *htot, *dx; // Output variables.
 
 	// 2-dimensional vector, where the Grid Cells are stored.
 	std::vector<std::vector<GridCell> > gridCells;
@@ -33,8 +33,13 @@ private:
 	// Initial condition setter.
 	void setInitialConditions();
 
-	// Write the netcdf
+	// Write the netcdf output file.
 	void writeVariablesToFile();
+
+	// Initialize non-boundary cells
+	void initializeCenterCells();
+
+	void initializeBoundaryCells();
 };
 
 #endif /* GRID_H_ */
