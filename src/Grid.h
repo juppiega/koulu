@@ -11,19 +11,23 @@ class Grid
 {
 public:
 	Grid (double height, double width, double resolution,
-			double upperLeftLatitude, double U, double initHeight, double simulationSeconds);
-	~Grid();
+			double upperLeftLatitude, double U, double initHeight,
+			double simulationSeconds, double writeInterval);
+	void simulate ();
+	~Grid ();
 
 private:
 	double height;  // Grid size in North-South direction (km).
 	double width;  // Grid size in East-West direction (km).
 	double resolution;  // Grid cell width (km).
 	double upperLeftLatitude;  // Latitude of North-West corner of the grid.
-	double simulationSeconds; // Length of simulation in seconds.
+	double simulationLength; // Length of simulation in seconds.
 	double U; // Speed of inflow at the western boundary (m/s).
 	double initHeight; // Initial total height (km)
 	double dt; // Timestep defined such that Courant condition (U*dt/dx) = 0.9
-	long timestepNum;
+	double courantNumber;
+
+	double writeInterval;
 	NcFile* ncfile; // Output file.
 	NcVar *t, *u, *v, *h, *htot, *dx; // Output variables.
 
@@ -31,15 +35,17 @@ private:
 	std::vector<std::vector<GridCell> > gridCells;
 
 	// Initial condition setter.
-	void setInitialConditions();
+	void setInitialConditions ();
 
 	// Write the netcdf output file.
-	void writeVariablesToFile();
+	void writeVariablesToFile (long timestepNum, double elapsedSeconds);
 
 	// Initialize non-boundary cells
-	void initializeCenterCells();
+	void initializeCenterCells ();
 
-	void initializeBoundaryCells();
+	void initializeBoundaryCells ();
+
+	void advanceGrid (long stepNum);
 };
 
 #endif /* GRID_H_ */
