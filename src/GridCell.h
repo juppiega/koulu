@@ -19,9 +19,6 @@ public:
 	double getVPredictor () const;
 	double getHPredictor () const;
 	double getHtotPredictor () const;
-	double getVPrevious () const;
-	double getUPrevious () const;
-	double getHPrevious () const;
 
 	// Setters
 	void setNorthernNeighbour (GridCell* c);
@@ -36,8 +33,10 @@ public:
 	void computePredictor (long stepNum);
 	void computeCorrector (long stepNum);
 
-	// Clamper
-	void clampSolution (long stepNum);
+	// Boundary condition declarations.
+	static double westU, westV;
+	static double northH, northV;
+	static double southV;
 
 private:
 	double u;  // Eastern wind component (m/s).
@@ -49,9 +48,8 @@ private:
 	double g;  // Gravitational acceleration (m/s^2).
 	double width; // Cell width
 	double dt; // Timestep
-	double duPredictor, dvPredictor, dhPredictor;
-	double uPredictor, vPredictor, hPredictor, htotPredictor;
-	double uPrevious, vPrevious, hPrevious;
+	double duPredictor, dvPredictor, dhPredictor; // Predictor time derivatives
+	double uPredictor, vPredictor, hPredictor, htotPredictor; // Predictor values
 	char boundaryType;
 
 	// Pointers to neighboring cells.
@@ -76,20 +74,13 @@ private:
 		double du, dv, dh;
 	};
 
-	void giveInitialStencil (stencil& us, stencil& vs, stencil& hs,
-			stencil& hts);
-	void givePredictorStencil (stencil& us, stencil& vs, stencil& hs,
-			stencil& hts);
-	void givePreviousStencil (stencil& us, stencil& vs, stencil& hs);
-	oneSidedDifferences stepForward (stencil& us, stencil& vs, stencil& hs,
-			stencil& hts);
-	oneSidedDifferences stepBackward (stencil& us, stencil& vs, stencil& hs,
-			stencil& hts);
+	// Get neighboring cell values.
+	void giveStencil (stencil& us, stencil& vs, stencil& hs,
+			stencil& hts, char stepType);
+
+	// Computes one sided derivatives using differences to directions given by xdir and ydir.
 	oneSidedDifferences computeDerivatives (stencil& us, stencil& vs,
 			stencil& hs, stencil& hts, char xdir, char ydir);
-
-	void clampIfNeeded (double uXPredDir, double uYPredDir, double vXPredDir,
-			double vYPredDir, double hXPredDir, double hYPredDir);
 };
 
 #endif /* GRIDCELL_H_ */
